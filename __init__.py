@@ -86,29 +86,30 @@ def maybe_adjust_filename_for_2136(filename):
 def inject_css(web_content, context):
     for filename in web_content.css.copy():
         filename = maybe_adjust_filename_for_2136(filename)
+        # looks like append means it will add the following lines to whatever it's modifying (maybe HTML)
         if filename in css_files_to_modify:
             web_content.css.append(f"/_addons/{addonfoldername}/web/css/{version_folder}/{filename}")
-            web_content.css.append(f"/_addons/{addonfoldername}/user_files/css/custom_{filename}") # seems that this overrides
+            web_content.css.append(f"/_addons/{addonfoldername}/user_files/css/custom_{filename}") # seems that this overrides the default above if I wanted to create a css
 
         f = filename
         css = ''
-        if f == "deckbrowser.css":
+        if f == "deckbrowser.css": #! to explore -- main menu?
             css = adjust_deckbrowser_css()
-        if f == "toolbar.css" and gc("Toolbar image"):
+        if f == "toolbar.css" and gc("Toolbar image"): #? seems irrelevant
             css = adjust_toolbar_css()
-        if f == "overview.css":
+        if f == "overview.css": #! to explore -- view when deck is clicked?
             css = adjust_overview_css()
-        if f == "toolbar-bottom.css" and gc("Toolbar image"):
+        if f == "toolbar-bottom.css" and gc("Toolbar image"): #? seems irrelevant
             css = adjust_bottomtoolbar_css()
-        if f == "reviewer.css" and gc("Reviewer image"):
-            css = adjust_reviewer_css()
-        if f == "reviewer-bottom.css":
+        if f == "reviewer.css" and gc("Reviewer image"): #! to explore -- bg when reviewing?
+            css = adjust_reviewer_css() 
+        if f == "reviewer-bottom.css": #? seems irrelevant
             if v == 22:
                 if gc("Reviewer image") and gc("Toolbar image"):
                     css = adjust_reviewerbottom_css()
             else:
                 css = adjust_reviewerbottom_css()
-        if css:
+        if css: # after filling out 'css', replace the head content with the following
             web_content.head += f"<style>{css}</style>"
 
 def inject_css_into_ts_page(web):
