@@ -73,8 +73,7 @@ mw.addonManager.setConfigUpdatedAction(__name__, apply_config_changes)
 
 
 css_files_to_modify = [
-    "webview.css", "deckbrowser.css", "overview.css", "reviewer-bottom.css",
-    "toolbar-bottom.css", "reviewer.css", "toolbar.css",
+    "webview.css", "deckbrowser.css", "overview.css","reviewer.css"
 ]
 
 from anki.utils import pointVersion 
@@ -127,8 +126,8 @@ def inject_css_into_ts_page(web):
 """ % json.dumps(css)
     )
 
-gui_hooks.webview_will_set_content.append(inject_css)
-gui_hooks.webview_did_inject_style_into_page.append(inject_css_into_ts_page)
+# gui_hooks.webview_will_set_content.append(inject_css)
+# gui_hooks.webview_did_inject_style_into_page.append(inject_css_into_ts_page)
 
 def get_gearfile():
     gear_abs = os.path.join(addon_path, "user_files", "gear")
@@ -160,6 +159,15 @@ def replace_gears(deck_browser, content):
         content.tree = content.tree.replace(old, old)
 gui_hooks.deck_browser_will_render_content.append(replace_gears)
 
+def deck_browse_test(deck_browser, content):
+    content.stats += "<p>my html</p>"
+    # orig = """review = nonzeroColour(node.review_count, "review-count")"""
+    # new = """review = '<span class='review-count'>0</span>'"""
+    ori = """<span class="review-count">"""
+    new = """<span class="review-count" hidden>"""
+    content.tree += "<p>hello there</p>"
+    content.tree = content.tree.replace(ori, new)
+gui_hooks.deck_browser_will_render_content.append(deck_browse_test)
 
 #No longer needed
 '''
