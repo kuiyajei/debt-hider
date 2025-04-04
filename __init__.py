@@ -57,7 +57,7 @@ from . import gui_updatemanager
 #         from anki import version as anki_version
 #         old_anki = tuple(int(i) for i in anki_version.split(".")) < (2, 1, 27)
 #         mw.deckBrowser.show()
-#         if not old_anki:        
+#         if not old_anki:
 #             #mw.reset(True)
 #             # Anki 2.1.28 and up no longer fully redraw the toolbar on mw reset,
 #             # so trigger the redraw manually:
@@ -67,7 +67,7 @@ from . import gui_updatemanager
 
 #reset background when changing config
 # def apply_config_changes(config):
-#     mw.moveToState("deckBrowser") 
+#     mw.moveToState("deckBrowser")
 #     #mw.toolbar.draw()
 # mw.addonManager.setConfigUpdatedAction(__name__, apply_config_changes)
 
@@ -76,10 +76,10 @@ from . import gui_updatemanager
 #     "webview.css", "deckbrowser.css", "overview.css","reviewer.css"
 # ]
 
-# from anki.utils import pointVersion 
-# def maybe_adjust_filename_for_2136(filename): 
-#     if pointVersion() >= 36: 
-#         filename = filename.lstrip("css/") 
+# from anki.utils import pointVersion
+# def maybe_adjust_filename_for_2136(filename):
+#     if pointVersion() >= 36:
+#         filename = filename.lstrip("css/")
 #     return filename
 
 # def inject_css(web_content, context):
@@ -101,7 +101,7 @@ from . import gui_updatemanager
 #         if f == "toolbar-bottom.css" and gc("Toolbar image"): #? seems irrelevant
 #             css = adjust_bottomtoolbar_css()
 #         if f == "reviewer.css" and gc("Reviewer image"): #! to explore -- bg when reviewing?
-#             css = adjust_reviewer_css() 
+#             css = adjust_reviewer_css()
 #         if f == "reviewer-bottom.css": #? seems irrelevant
 #             if v == 22:
 #                 if gc("Reviewer image") and gc("Toolbar image"):
@@ -159,50 +159,29 @@ from . import gui_updatemanager
 #         content.tree = content.tree.replace(old, old)
 # gui_hooks.deck_browser_will_render_content.append(replace_gears)
 
-override_text = """<script>var paras = document.querySelectorAll(".review-count"); for (let para of paras) {
-    para.textContent = "⏳";
-  } </script>"""
+# Much as I wanted to put a "complete" symbol, all classes.
+override_due_text = """
+<script>
+    var dues = document.querySelectorAll(".review-count"); 
+    for (let x of dues) {
+        x.textContent = "⏳";
+        x.style.
+    } 
+    var finished = document.querySelectorAll(".zero-count"); 
+    for (let x of finished) {
+        x.textContent = "☑";
+    } 
+</script>
+"""
 
 def deck_browser_hide(deck_browser, content):
     # content.tree += f"{content.tree}"
-    # TODO: Try to retrieve span instead of manually replacing by character?
     # original = """<span class="review-count">"""
     # new = """<span>📑</span><span class="review-count" hidden>"""
     # content.tree = content.tree.replace(original, new)
-    content.tree += override_text
+    content.tree += override_due_text
 gui_hooks.deck_browser_will_render_content.append(deck_browser_hide)
 
 def deck_overview_hide(overview, content):
-    # content.table += f"{content.table}"
-    # TODO: Try to retrieve span instead of manually replacing by character?
-    # original = """<span class="review-count">"""
-    # new = """<span>📑</span><span class="review-count" hidden>"""
-    # content.table = content.table.replace(original, new)
-    content.table += override_text
+    content.table += override_due_text
 gui_hooks.overview_will_render_content.append(deck_overview_hide)
-
-#No longer needed
-'''
-menu = QMenu(('Custom Background & Gear Icon'), mw)
-mw.form.menuTools.addMenu(menu)
-
-#add config button
-def on_advanced_settings():
-	addonDlg = AddonsDialog(mw.addonManager)
-	addonDlg.accept() #closes addon dialog
-	ConfigEditor(addonDlg,__name__,mw.addonManager.getConfig(__name__))
-
-#menu.addSeparator()
-advanced_settings = QAction('Set up Background/Gear (Config)', mw)
-menu.addAction(advanced_settings)
-advanced_settings.triggered.connect(on_advanced_settings)
-
-shortcut = gc("Keyboard Shortcut", "Ctrl+shift+b")
-#add folder button
-imgfolder = os.path.join(addon_path, "user_files") 
-action = QAction(mw) 
-action.setText("Background/gear image folder") 
-action.setShortcut(QKeySequence(shortcut))
-menu.addAction(action) 
-action.triggered.connect(lambda: openFolder(imgfolder))
-'''
