@@ -20,7 +20,7 @@ from aqt.addons import *
 from aqt.utils import openFolder 
 from .adjust_css import *
 
-QDir.addSearchPath("CustomBackground", str(Path(__file__).parent / "AnKing"))
+# QDir.addSearchPath("CustomBackground", str(Path(__file__).parent / "AnKing"))
 
 
 
@@ -30,144 +30,156 @@ from .config import addon_path, addonfoldername, gc, getUserOption
 #a = Manager()
 from . import gui_updatemanager
 
-css_folder_for_anki_version = {
-    "22": "22", "23": "22", "24": "22",
-    "25": "25","26": "25","27": "25","28": "25","29": "25",
-    "30": "25","31": "31","32": "31","33": "31","34": "31",
-    "35": "31","36": "36","37": "36","38": "36","39": "36",
-    "40": "36","41": "36","42": "36","43": "36","44": "36",
-    "45": "36","46": "36","47": "36","48": "36","49": "36",
-    "50": "36","51": "36","52": "36","53": "36","54": "36",
-    "55": "55",
-}
-v = str(pointVersion())
+# css_folder_for_anki_version = {
+#     "22": "22", "23": "22", "24": "22",
+#     "25": "25","26": "25","27": "25","28": "25","29": "25",
+#     "30": "25","31": "31","32": "31","33": "31","34": "31",
+#     "35": "31","36": "36","37": "36","38": "36","39": "36",
+#     "40": "36","41": "36","42": "36","43": "36","44": "36",
+#     "45": "36","46": "36","47": "36","48": "36","49": "36",
+#     "50": "36","51": "36","52": "36","53": "36","54": "36",
+#     "55": "55",
+# }
+# v = str(pointVersion())
 
-if v in css_folder_for_anki_version:
-    version_folder = css_folder_for_anki_version[v]
-else:  # for newer Anki versions try the latest version and hope for the best
-    version_folder = css_folder_for_anki_version[max(css_folder_for_anki_version, key=int)]
+# if v in css_folder_for_anki_version:
+#     version_folder = css_folder_for_anki_version[v]
+# else:  # for newer Anki versions try the latest version and hope for the best
+#     version_folder = css_folder_for_anki_version[max(css_folder_for_anki_version, key=int)]
 
 
-regex = r"(user_files.*|web.*)"
-mw.addonManager.setWebExports(__name__, regex)
+# regex = r"(user_files.*|web.*)"
+# mw.addonManager.setWebExports(__name__, regex)
 
 #reset background when refreshing page (for use with "random" setting)
-def reset_background(new_state, old_state):
-    if new_state == "deckBrowser":
-        from anki import version as anki_version
-        old_anki = tuple(int(i) for i in anki_version.split(".")) < (2, 1, 27)
-        mw.deckBrowser.show()
-        if not old_anki:        
-            #mw.reset(True)
-            # Anki 2.1.28 and up no longer fully redraw the toolbar on mw reset,
-            # so trigger the redraw manually:
-            mw.toolbar.draw()
+# def reset_background(new_state, old_state):
+#     if new_state == "deckBrowser":
+#         from anki import version as anki_version
+#         old_anki = tuple(int(i) for i in anki_version.split(".")) < (2, 1, 27)
+#         mw.deckBrowser.show()
+#         if not old_anki:        
+#             #mw.reset(True)
+#             # Anki 2.1.28 and up no longer fully redraw the toolbar on mw reset,
+#             # so trigger the redraw manually:
+#             mw.toolbar.draw()
 
-gui_hooks.state_did_change.append(reset_background)
+# gui_hooks.state_did_change.append(reset_background)
 
 #reset background when changing config
-def apply_config_changes(config):
-    mw.moveToState("deckBrowser") 
-    #mw.toolbar.draw()
-mw.addonManager.setConfigUpdatedAction(__name__, apply_config_changes)
+# def apply_config_changes(config):
+#     mw.moveToState("deckBrowser") 
+#     #mw.toolbar.draw()
+# mw.addonManager.setConfigUpdatedAction(__name__, apply_config_changes)
 
 
-css_files_to_modify = [
-    "webview.css", "deckbrowser.css", "overview.css","reviewer.css"
-]
+# css_files_to_modify = [
+#     "webview.css", "deckbrowser.css", "overview.css","reviewer.css"
+# ]
 
-from anki.utils import pointVersion 
-def maybe_adjust_filename_for_2136(filename): 
-    if pointVersion() >= 36: 
-        filename = filename.lstrip("css/") 
-    return filename
+# from anki.utils import pointVersion 
+# def maybe_adjust_filename_for_2136(filename): 
+#     if pointVersion() >= 36: 
+#         filename = filename.lstrip("css/") 
+#     return filename
 
-def inject_css(web_content, context):
-    for filename in web_content.css.copy():
-        filename = maybe_adjust_filename_for_2136(filename)
-        # looks like append means it will add the following lines to whatever it's modifying (maybe HTML)
-        if filename in css_files_to_modify:
-            web_content.css.append(f"/_addons/{addonfoldername}/web/css/{version_folder}/{filename}")
-            web_content.css.append(f"/_addons/{addonfoldername}/user_files/css/custom_{filename}") # seems that this overrides the default above if I wanted to create a css
+# def inject_css(web_content, context):
+#     for filename in web_content.css.copy():
+#         filename = maybe_adjust_filename_for_2136(filename)
+#         # looks like append means it will add the following lines to whatever it's modifying (maybe HTML)
+#         if filename in css_files_to_modify:
+#             web_content.css.append(f"/_addons/{addonfoldername}/web/css/{version_folder}/{filename}")
+#             web_content.css.append(f"/_addons/{addonfoldername}/user_files/css/custom_{filename}") # seems that this overrides the default above if I wanted to create a css
 
-        f = filename
-        css = ''
-        if f == "deckbrowser.css": #! to explore -- main menu?
-            css = adjust_deckbrowser_css()
-        if f == "toolbar.css" and gc("Toolbar image"): #? seems irrelevant
-            css = adjust_toolbar_css()
-        if f == "overview.css": #! to explore -- view when deck is clicked?
-            css = adjust_overview_css()
-        if f == "toolbar-bottom.css" and gc("Toolbar image"): #? seems irrelevant
-            css = adjust_bottomtoolbar_css()
-        if f == "reviewer.css" and gc("Reviewer image"): #! to explore -- bg when reviewing?
-            css = adjust_reviewer_css() 
-        if f == "reviewer-bottom.css": #? seems irrelevant
-            if v == 22:
-                if gc("Reviewer image") and gc("Toolbar image"):
-                    css = adjust_reviewerbottom_css()
-            else:
-                css = adjust_reviewerbottom_css()
-        if css: # after filling out 'css', replace the head content with the following
-            web_content.head += f"<style>{css}</style>"
+#         f = filename
+#         css = ''
+#         if f == "deckbrowser.css": #! to explore -- main menu?
+#             css = adjust_deckbrowser_css()
+#         if f == "toolbar.css" and gc("Toolbar image"): #? seems irrelevant
+#             css = adjust_toolbar_css()
+#         if f == "overview.css": #! to explore -- view when deck is clicked?
+#             css = adjust_overview_css()
+#         if f == "toolbar-bottom.css" and gc("Toolbar image"): #? seems irrelevant
+#             css = adjust_bottomtoolbar_css()
+#         if f == "reviewer.css" and gc("Reviewer image"): #! to explore -- bg when reviewing?
+#             css = adjust_reviewer_css() 
+#         if f == "reviewer-bottom.css": #? seems irrelevant
+#             if v == 22:
+#                 if gc("Reviewer image") and gc("Toolbar image"):
+#                     css = adjust_reviewerbottom_css()
+#             else:
+#                 css = adjust_reviewerbottom_css()
+#         if css: # after filling out 'css', replace the head content with the following
+#             web_content.head += f"<style>{css}</style>"
 
-def inject_css_into_ts_page(web):
-    page = os.path.basename(web.page().url().path())
-    if page != "congrats.html":
-        return
-    css = adjust_congrats_css()
-    web.eval(
-        """
-(() => {
-    const style = document.createElement("style");
-    style.textContent= %s;
-    document.head.appendChild(style);
-})();
-""" % json.dumps(css)
-    )
+# def inject_css_into_ts_page(web):
+#     page = os.path.basename(web.page().url().path())
+#     if page != "congrats.html":
+#         return
+#     css = adjust_congrats_css()
+#     web.eval(
+#         """
+# (() => {
+#     const style = document.createElement("style");
+#     style.textContent= %s;
+#     document.head.appendChild(style);
+# })();
+# """ % json.dumps(css)
+#     )
 
 # gui_hooks.webview_will_set_content.append(inject_css)
 # gui_hooks.webview_did_inject_style_into_page.append(inject_css_into_ts_page)
 
-def get_gearfile():
-    gear_abs = os.path.join(addon_path, "user_files", "gear")
-    os.makedirs(gear_abs, exist_ok=True)
-    if not os.listdir(gear_abs):
-        shutil.copytree(src=os.path.join(addon_path, "user_files", "default_gear"), dst=gear_abs, dirs_exist_ok=True)
+# def get_gearfile():
+#     gear_abs = os.path.join(addon_path, "user_files", "gear")
+#     os.makedirs(gear_abs, exist_ok=True)
+#     if not os.listdir(gear_abs):
+#         shutil.copytree(src=os.path.join(addon_path, "user_files", "default_gear"), dst=gear_abs, dirs_exist_ok=True)
+#
+#     gear_list = [os.path.basename(f) for f in os.listdir(gear_abs) if f.endswith(pics)]
+#     val = gc("Image name for gear")
+#     if val and val.lower() == "random":
+#         return random.choice(gear_list)
+#     if val in gear_list:
+#         return val
+#     else:
+#         # if empty or illegal value try to use 'AnKing.png' to signal that an illegal values was
+#         # used AnKing's gears folder doesn't contain a file named "gears.svg"
+#         if "AnKing.png" in gear_list:
+#             return "AnKing.png"
+#         else:
+#             return ""
 
-    gear_list = [os.path.basename(f) for f in os.listdir(gear_abs) if f.endswith(pics)]
-    val = gc("Image name for gear")
-    if val and val.lower() == "random":
-        return random.choice(gear_list)
-    if val in gear_list:
-        return val
-    else:
-        # if empty or illegal value try to use 'AnKing.png' to signal that an illegal values was
-        # used AnKing's gears folder doesn't contain a file named "gears.svg"
-        if "AnKing.png" in gear_list:
-            return "AnKing.png"
-        else:
-            return ""
 
+# def replace_gears(deck_browser, content):
+#     old = """<img src='/_anki/imgs/gears.svg'"""
+#     new = f"""<img src='/_addons/{addonfoldername}/user_files/gear/{get_gearfile()}'"""
+#     if gc("Image name for gear") != "gears.svg":
+#         content.tree = content.tree.replace(old, new)
+#     else:
+#         content.tree = content.tree.replace(old, old)
+# gui_hooks.deck_browser_will_render_content.append(replace_gears)
 
-def replace_gears(deck_browser, content):
-    old = """<img src='/_anki/imgs/gears.svg'"""
-    new = f"""<img src='/_addons/{addonfoldername}/user_files/gear/{get_gearfile()}'"""
-    if gc("Image name for gear") != "gears.svg":
-        content.tree = content.tree.replace(old, new)
-    else:
-        content.tree = content.tree.replace(old, old)
-gui_hooks.deck_browser_will_render_content.append(replace_gears)
+override_text = """<script>var paras = document.querySelectorAll(".review-count"); for (let para of paras) {
+    para.textContent = "⏳";
+  } </script>"""
 
-def deck_browse_test(deck_browser, content):
-    content.stats += "<p>my html</p>"
-    # orig = """review = nonzeroColour(node.review_count, "review-count")"""
-    # new = """review = '<span class='review-count'>0</span>'"""
-    ori = """<span class="review-count">"""
-    new = """<span class="review-count" hidden>"""
-    content.tree += "<p>hello there</p>"
-    content.tree = content.tree.replace(ori, new)
-gui_hooks.deck_browser_will_render_content.append(deck_browse_test)
+def deck_browser_hide(deck_browser, content):
+    # content.tree += f"{content.tree}"
+    # TODO: Try to retrieve span instead of manually replacing by character?
+    # original = """<span class="review-count">"""
+    # new = """<span>📑</span><span class="review-count" hidden>"""
+    # content.tree = content.tree.replace(original, new)
+    content.tree += override_text
+gui_hooks.deck_browser_will_render_content.append(deck_browser_hide)
+
+def deck_overview_hide(overview, content):
+    # content.table += f"{content.table}"
+    # TODO: Try to retrieve span instead of manually replacing by character?
+    # original = """<span class="review-count">"""
+    # new = """<span>📑</span><span class="review-count" hidden>"""
+    # content.table = content.table.replace(original, new)
+    content.table += override_text
+gui_hooks.overview_will_render_content.append(deck_overview_hide)
 
 #No longer needed
 '''
