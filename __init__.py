@@ -22,13 +22,11 @@ from .adjust_css import *
 
 # QDir.addSearchPath("CustomBackground", str(Path(__file__).parent / "AnKing"))
 
+# from .config import addon_path, addonfoldername, gc, getUserOption
 
-
-from .config import addon_path, addonfoldername, gc, getUserOption
-
-#from .gui import Manager
-#a = Manager()
-from . import gui_updatemanager
+# from .gui import Manager
+# a = Manager()
+# from . import gui_updatemanager
 
 # css_folder_for_anki_version = {
 #     "22": "22", "23": "22", "24": "22",
@@ -159,13 +157,12 @@ from . import gui_updatemanager
 #         content.tree = content.tree.replace(old, old)
 # gui_hooks.deck_browser_will_render_content.append(replace_gears)
 
-# Much as I wanted to put a "complete" symbol, all classes.
+# Much as I wanted to put a "complete" symbol, all data with zero-count share the same class name.
 override_due_text = """
 <script>
     var dues = document.querySelectorAll(".review-count"); 
     for (let x of dues) {
         x.textContent = "⏳";
-        x.style.
     } 
     var finished = document.querySelectorAll(".zero-count"); 
     for (let x of finished) {
