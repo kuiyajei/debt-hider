@@ -1,7 +1,8 @@
 from aqt import gui_hooks
 
-# Appends the following to Anki's HTML. Iterates through every element with the attribute of classes.
+# JavaScript to append into Anki's HTML. Iterates through every element of specific classes and replaces their content.
 override_due_text = """
+
 <script>
     document.addEventListener("DOMContentLoaded", function() {
         var dues = document.querySelectorAll(".review-count"); 
