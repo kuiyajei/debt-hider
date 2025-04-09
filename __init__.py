@@ -8,7 +8,7 @@ override_due_text = """
         var dues = document.querySelectorAll(".review-count"); 
         for (let x of dues) {
             x.textContent = "!";
-            x.style.color = "yellow"
+            x.style.color = "orange"
         } 
         var finished = document.querySelectorAll(".zero-count"); 
         for (let x of finished) {
